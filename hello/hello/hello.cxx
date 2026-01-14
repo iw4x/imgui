@@ -136,9 +136,9 @@ namespace hello
 }
 
 int
-setup_imgui (int argc, char* argv [])
+main (int argc, char* argv [])
 {
   using namespace hello;
 
-  renderer ();
+  setup_imgui ();
 }
