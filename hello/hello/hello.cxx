@@ -58,10 +58,24 @@ namespace hello
   namespace
   {
     void
-    renderer ()
+    error (const char* msg)
     {
+      cerr << "error: " << msg << endl;
+    }
+
+    void
+    glfw_error_callback (int error, const char* desc)
+    {
+      cerr << "glfw error (" << error << "): " << desc << endl;
+    }
+
+    void
+    setup_imgui ()
+    {
+      glfwSetErrorCallback (glfw_error_callback);
+
       if (!glfwInit ())
-        throw runtime_error ("unable to initialize glfw");
+        exit (1);
 
       glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
       glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -69,15 +83,15 @@ namespace hello
       glfwWindowHint (GLFW_RESIZABLE, GLFW_FALSE);
       glfwWindowHint (GLFW_DECORATED, GLFW_FALSE);
 
-      GLFWwindow* window (glfwCreateWindow (1280, 720, "Hello", nullptr, nullptr));
-      if (!window)
-        throw runtime_error ("unable to create glfw window");
+      GLFWwindow* w (glfwCreateWindow (1280, 720, "Hello", nullptr, nullptr));
+      if (!w)
+        exit (1);
 
-      glfwMakeContextCurrent (window);
+      glfwMakeContextCurrent (w);
       glfwSwapInterval (1);
 
       ImGui::CreateContext ();
-      ImGui::ImplGlfwInitForOpenGL (window, true);
+      ImGui::ImplGlfwInitForOpenGL (w, true);
       ImGui::ImplOpenGL3Init ("#version 330");
 
       ImGuiIO& io (ImGui::GetIO ());
@@ -88,7 +102,7 @@ namespace hello
       style.WindowPadding = ImVec2 (0.0f, 0.0f);
       style.WindowRounding = 0.0f;
 
-      while (!glfwWindowShouldClose (window))
+      while (!glfwWindowShouldClose (w))
       {
         glfwPollEvents ();
 
@@ -108,21 +122,21 @@ namespace hello
         ImGui::Render ();
         ImGui::ImplOpenGL3RenderDrawData (ImGui::GetDrawData ());
 
-        glfwSwapBuffers (window);
+        glfwSwapBuffers (w);
       }
 
       ImGui::ImplOpenGL3Shutdown ();
       ImGui::ImplGlfwShutdown ();
       ImGui::DestroyContext ();
 
-      glfwDestroyWindow (window);
+      glfwDestroyWindow (w);
       glfwTerminate ();
     }
   }
 }
 
 int
-main (int argc, char* argv [])
+setup_imgui (int argc, char* argv [])
 {
   using namespace hello;
 
